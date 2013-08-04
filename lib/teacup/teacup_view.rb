@@ -122,11 +122,13 @@ module Teacup
 
     def restyle!(orientation=nil)
       if Teacup.should_restyle?
+        #stylesheet is cached, we use weakref to avoid cyclic ref
+        weak_self=WeakRef.new(self)
         if stylesheet && stylesheet.is_a?(Teacup::Stylesheet)
-          style_classes.each do |stylename|
-            style(stylesheet.query(stylename, self, orientation))
-          end
-          style(stylesheet.query(self.stylename, self, orientation))
+         style_classes.each do |stylename|
+           style(stylesheet.query(stylename, weak_self, orientation))
+         end
+         style(stylesheet.query(self.stylename, weak_self, orientation))
         end
         teacup_subviews.each { |subview| subview.restyle!(orientation) }
       end
